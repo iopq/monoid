@@ -1,0 +1,5 @@
+[package]
+
+name = "monoid"
+version = "0.0.1"
+authors = ["Igor Polyakov <iopguy@gmail.com>"]
