@@ -1,7 +1,7 @@
 [package]
 
 name = "monoid"
-version = "0.0.1"
+version = "0.0.2"
 authors = ["Igor Polyakov <iopguy@gmail.com>"]
 description = "A package providing some common monoids for use in Rust"
 repository = "https://github.com/iopq/monoid"
