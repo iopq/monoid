@@ -12,9 +12,9 @@ pub trait Monoid {
     fn op(self, other: Self) -> Self;
 }
 
-impl Monoid for CowString<'static> {
-    fn id() -> CowString<'static> { "".into_cow() }
-    fn op(self, other: CowString<'static>) -> CowString<'static> {
+impl<'a> Monoid for CowString<'a> {
+    fn id() -> CowString<'a> { "".into_cow() }
+    fn op(self, other: CowString<'a>) -> CowString<'a> {
         let mut owned = self.into_owned();
         owned.push_str(&*other);
         owned.into_cow()
@@ -79,9 +79,9 @@ mod tests {
 #[bench]
 fn bench_cowstring(b: &mut test::Bencher) {
     b.iter(|| {
-        let mut fizz = "Fizz".into_cow();
+        let mut fizz = "Fizz".into_cow().into_owned();
         let mut buzz = "Buzz".into_cow();
-        (fizz.into_owned() + &*buzz).into_cow()
+        (fizz + &*buzz).into_cow()
     });
 }
 
