@@ -1,7 +1,6 @@
-#![feature(test, core)]
+#![feature(test)]
 
 extern crate test;
-extern crate core;
 
 use std::borrow::Cow;
 use std::convert::{AsRef, Into};
