@@ -1,7 +1,10 @@
-extern crate test;
+#![feature(test, core)]
 
-use std::string::CowString;
-use std::borrow::IntoCow;
+extern crate test;
+extern crate core;
+
+use std::borrow::Cow;
+use std::convert::{AsRef, Into};
 
 pub trait Monoid {
     // don't have associated values yet, so use a nullary function
@@ -12,12 +15,12 @@ pub trait Monoid {
     fn op(self, other: Self) -> Self;
 }
 
-impl<'a> Monoid for CowString<'a> {
-    fn id() -> CowString<'a> { "".into_cow() }
-    fn op(self, other: CowString<'a>) -> CowString<'a> {
+impl<'a> Monoid for Cow<'a, str> {
+    fn id() -> Cow<'a, str> { "".into() }
+    fn op(self, other: Cow<'a, str>) -> Cow<'a, str> {
         let mut owned = self.into_owned();
         owned.push_str(&*other);
-        owned.into_cow()
+        owned.into()
     }
 }
 
@@ -25,7 +28,7 @@ impl<'a> Monoid for CowString<'a> {
 impl Monoid for String {
     fn id() -> String { "".to_string() } // identity is empty string
     fn op(self, other: String) -> String {
-        self + other.as_slice()
+        self + other.as_ref()
     }
 }
 
@@ -44,16 +47,17 @@ impl<A: Monoid> Monoid for Option<A> {
 #[cfg(test)]
 mod tests {
     use super::Monoid;
-    use std::string::CowString;
-    use std::borrow::IntoCow;
-    
+	use std::borrow::Cow;
+	use std::convert::Into;
+
     #[test]
     fn string_append() {
         assert_eq!("abcdef".to_string(), "abc".to_string().op("def".to_string()));
     }
     
+	#[test]
     fn cowstring_append() {
-        assert_eq!("abcdef".into_cow(), "abc".into_cow().op("def".into_cow()));
+        assert_eq!(Into::<Cow<_>>::into("abcdef"), Into::<Cow<_>>::into("abc").op(Into::<Cow<_>>::into("def")));
     }
     
     #[test]
@@ -71,6 +75,7 @@ mod tests {
         assert_eq!(Some("one".to_string()), None.op(Some("one".to_string())));
     }
     
+	#[test]
     fn both() {
         assert_eq!(Some("oneone".to_string()), Some("one".to_string()).op(Some("one".to_string())));
     }
@@ -79,19 +84,19 @@ mod tests {
 #[bench]
 fn bench_cowstring(b: &mut test::Bencher) {
     b.iter(|| {
-        let mut fizz = "Fizz".into_cow().into_owned();
-        let mut buzz = "Buzz".into_cow();
-        (fizz + &*buzz).into_cow()
+        let fizz = Into::<Cow<_>>::into("Fizz").into_owned();
+        let buzz = Into::<Cow<_>>::into("Buzz");
+        Into::<Cow<_>>::into(fizz + &*buzz)
     });
 }
 
 #[bench]
 fn bench_cowstring_ms2ger(b: &mut test::Bencher) {
     b.iter( || {  
-            let mut fizz = "Fizz".into_cow().into_owned();
-            let mut buzz = "Buzz".into_cow();
+            let mut fizz = Into::<Cow<_>>::into("Fizz").into_owned();
+            let buzz = Into::<Cow<_>>::into("Buzz");
             fizz.push_str(&*buzz);
-            fizz.into_cow();
+            Into::<Cow<_>>::into(fizz);
         }
     );
 }
