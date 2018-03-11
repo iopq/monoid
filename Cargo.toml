@@ -7,7 +7,7 @@ repository = "https://github.com/iopq/monoid"
 version = "0.0.5"
 
 [dependencies]
-bencher = "*"
+bencher = "0.1.5"
 
 [[bench]]
 name = "benches"
