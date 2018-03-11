@@ -1,8 +1,14 @@
 [package]
-
-name = "monoid"
-version = "0.0.4"
 authors = ["Igor Polyakov <iopguy@gmail.com>"]
 description = "A package providing some common monoids for use in Rust"
-repository = "https://github.com/iopq/monoid"
 license = "MIT"
+name = "monoid"
+repository = "https://github.com/iopq/monoid"
+version = "0.0.4"
+
+[dependencies]
+bencher = "*"
+
+[[bench]]
+name = "benches"
+harness = false
