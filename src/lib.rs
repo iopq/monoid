@@ -1,9 +1,9 @@
+#![feature(const_string_new)]
 use std::borrow::Cow;
 use std::convert::{AsRef, Into};
 
 pub trait Monoid {
-    // don't have associated values yet, so use a nullary function
-    fn id() -> Self;
+    const ID: Self;
     // an associative binary operation
     // this version consumes arguments
     // a non-consuming version might be possible
@@ -11,7 +11,7 @@ pub trait Monoid {
 }
 
 impl<'a> Monoid for Cow<'a, str> {
-    fn id() -> Cow<'a, str> { "".into() }
+    const ID: Self = Cow::Borrowed("");
     fn op(self, other: Cow<'a, str>) -> Cow<'a, str> {
         let mut owned = self.into_owned();
         owned.push_str(&*other);
@@ -21,7 +21,7 @@ impl<'a> Monoid for Cow<'a, str> {
 
 // Strings are a Monoid over concatenation
 impl Monoid for String {
-    fn id() -> String { "".to_string() } // identity is empty string
+    const ID: Self = String::new();
     fn op(self, other: String) -> String {
         self + other.as_ref()
     }
@@ -29,7 +29,7 @@ impl Monoid for String {
 
 // Options are Monoids if they contain Monoids
 impl<A: Monoid> Monoid for Option<A> {
-    fn id() -> Option<A> { None }
+    const ID: Self = None;
     fn op(self, other: Option<A>) -> Option<A> {
         match (self, other) {
              (None, b) => b,
